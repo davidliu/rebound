@@ -1563,30 +1563,44 @@ public class SpringScrollView extends FrameLayout {
     final int right = maxOverScrollX + scrollRangeX + padding;
     final int top = -maxOverScrollY - padding;
     final int bottom = maxOverScrollY + scrollRangeY + padding;
-
+    int overscrollX = 0;
+    int overscrollY = 0;
     boolean clampedX = false;
     if (newScrollX > right) {
 //      newScrollX = right;
       clampedX = true;
+      overscrollX = newScrollX - right;
     } else if (newScrollX < left) {
 //      newScrollX = left;
       clampedX = true;
+      overscrollX = newScrollX - left;
     }
 
     boolean clampedY = false;
     if (newScrollY > bottom) {
 //      newScrollY = bottom;
       clampedY = true;
+      overscrollY = newScrollY - bottom;
     } else if (newScrollY < top) {
 //      newScrollY = top;
       clampedY = true;
+      overscrollY = newScrollY - top;
     }
 
+    float deltaXFactor = 1;
+    float deltaYFactor = 1;
+
+    if (overscrollX != 0) {
+      deltaXFactor = Math.min(1.0f, Math.abs((1.0f / (overscrollX / 40.0f))));
+    }
+    if (overscrollY != 0) {
+      deltaYFactor = Math.min(1.0f, Math.abs((1.0f / (overscrollY / 40.0f))));
+    }
     if (mIsBeingDragged && clampedX) {
-      newScrollX = (int)(scrollX + deltaX * 0.25);
+      newScrollX = (int) (scrollX + deltaX * deltaXFactor);
     }
     if (mIsBeingDragged && clampedY) {
-      newScrollY = (int)(scrollY + deltaY * 0.25);
+      newScrollY = (int) (scrollY + deltaY * deltaYFactor);
     }
 
     onOverScrolled(newScrollX, newScrollY, clampedX, clampedY);
